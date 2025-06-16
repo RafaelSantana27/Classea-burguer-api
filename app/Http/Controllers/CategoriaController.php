@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Categoria;
+use App\Services\ApiResponse;
 use Illuminate\Http\Request;
 
 class CategoriaController extends Controller
@@ -13,7 +14,7 @@ class CategoriaController extends Controller
     public function index()
     {
         // retorna todas as categorias da base de dados
-        return response()->json(Categoria::all(), 200);
+        return ApiResponse::sucesso(Categoria::all());
     }
 
     /**
@@ -40,12 +41,8 @@ class CategoriaController extends Controller
         // Add nova Categoria na base de dados
         $categoria = Categoria::create($request->all());
 
-        return response()->json(
-            [
-                'message' => 'Categoria cadastrada com sucesso!',
-                'data' => $categoria,
-            ], 200
-        );
+        return ApiResponse::sucesso($categoria, 'Categoria cadastrada com sucesso');
+
     }
 
     /**
@@ -57,11 +54,9 @@ class CategoriaController extends Controller
         $categoria = Categoria::Find($id);
 
         if($categoria) {
-            return response()->json($categoria, 200);
+            return ApiResponse::sucesso($categoria);
         } else {
-            return response()->json([
-                'message' => 'Categoria não encontrada'
-            ], 404);
+            return ApiResponse::erro('Categoria não encontrada');
         }
     }
 
@@ -90,16 +85,10 @@ class CategoriaController extends Controller
 
         if($categoria) {
             $categoria->update($request->all());
-            return response()->json([
-                'message' => 'Categoria atualizada com sucesso!',
-                'data' => $categoria
-            ], 200);
+            return ApiResponse::sucesso($categoria, 'Categoria atualizada com sucesso!');
         } else {
-             return response()->json([
-                'message' => 'Categoria não encontrada'
-            ], 404);
+             return ApiResponse::erro('Categoria não encontrada');
         }
-
     }
 
     /**
@@ -112,13 +101,9 @@ class CategoriaController extends Controller
 
         if($categoria) {
             $categoria->delete();
-            return response()->json([
-                'message' => 'Categoria deletada com sucesso!',
-            ], 200);
+            return ApiResponse::sucesso($categoria, 'Categoria deletada com sucesso!');
         } else {
-             return response()->json([
-                'message' => 'Categoria não encontrada'
-            ], 404);
+             return ApiResponse::erro('Categoria não encontrada');
         }
     }
 }
