@@ -13,7 +13,7 @@ class CategoriaController extends Controller
      */
     public function index()
     {
-        // retorna todas as categorias da base de dados
+        // Retorna todas as categorias da base de dados
         return ApiResponse::sucesso(Categoria::all());
     }
 
