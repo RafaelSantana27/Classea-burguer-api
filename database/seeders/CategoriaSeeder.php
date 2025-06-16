@@ -23,6 +23,7 @@ class CategoriaSeeder extends Seeder
             ['nome' => 'Bebidas', 'ativo' => true],
             ['nome' => 'Sucos', 'ativo' => true],
             ['nome' => 'MilkShakes', 'ativo' => true],
+            ['nome' => 'Combos', 'ativo' => true],
         ];
 
         foreach ($categorias as $categoria) {
