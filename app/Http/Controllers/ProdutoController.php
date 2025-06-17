@@ -22,7 +22,9 @@ class ProdutoController extends Controller
      */
     public function store(Request $request)
     {
-        // Validar o produto
+        // Validar o produto - ************FORM REQUEST
+
+        // REFAZER ESTRUTURA DO CODIGO - ERRO NA VALIDAÇÃO
         $validacao = $request->validate(
             [
                 'nome' => 'required|string|min:3|max:100',
