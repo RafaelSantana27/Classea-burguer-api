@@ -13,7 +13,8 @@ Route::get('/status', function() {
 })->middleware('auth:sanctum');
 
 // Categoria
-Route::apiResource('categorias', CategoriaController::class)->middleware('auth:sanctum');
+Route::apiResource('categorias', CategoriaController::class);
+// ->middleware('auth:sanctum');
 
 // Produtos
 Route::apiResource('produtos', ProdutoController::class);

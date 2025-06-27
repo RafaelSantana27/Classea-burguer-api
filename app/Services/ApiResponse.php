@@ -22,10 +22,10 @@ class ApiResponse
     {
         return response()->json(
             [
-                'codigo_status' => 500,
+                'codigo_status' => 404,
                 'mensagem' => $mensagem
             ],
-            500
+            404
         );
     }
 
