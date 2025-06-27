@@ -1,17 +1,22 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\ProdutoController;
 use App\Services\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Laravel\Sanctum\Sanctum;
 
 Route::get('/status', function() {
     return ApiResponse::sucesso('API está funcionando');
-});
+})->middleware('auth:sanctum');
 
 // Categoria
-Route::apiResource('categorias', CategoriaController::class);
+Route::apiResource('categorias', CategoriaController::class)->middleware('auth:sanctum');
 
 // Produtos
 Route::apiResource('produtos', ProdutoController::class);
+
+// auth routes
+Route::post('/login', [AuthController::class, 'login']);
