@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProdutoRequest;
 use App\Models\Produto;
 use App\Services\ApiResponse;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProdutoController extends Controller
 {
@@ -20,57 +21,14 @@ class ProdutoController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(ProdutoRequest $request)
     {
-        // Validar o produto - ************FORM REQUEST
+        // Add novo 'Produto' na base de dados
+        $dadosProduto = $request->validated();
 
-        // REFAZER ESTRUTURA DO CODIGO - ERRO NA VALIDAÇÃO
-        $validacao = $request->validate(
-            [
-                'nome' => 'required|string|min:3|max:100',
-                'descricao' => 'nullable|string|max:1000',
-                'preco' => 'required|numeric|min:0.01',
-                'categoria_id' => 'required|exists:categorias,id',
-                'imagem' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-                'ativo' => 'required|boolean',
-            ],
-            [
-                // nome
-                'nome.required' => 'O nome do produto é obrigatório.',
-                'nome.string' => 'O nome do produto deve ser um texto válido.',
-                'nome.min' => 'O nome do produto deve ter no mínimo 3 caracteres.', 
-                'nome.max' => 'O nome do produto não pode ter mais que 100 caracteres.', 
-                
-                // descricao
-                'descricao.string' => 'A descrição do produto deve ser um texto válido.',
-                'descricao.max' => 'A descrição do produto não pode ter mais que 1000 caracteres.',
+        $dadosProduto['imagem'] = $this->uploadImagem($request);
 
-                // preco
-                'preco.required' => 'O preço do produto é obrigatório.',
-                'preco.numeric' => 'O preço deve ser um número válido.',
-                'preco.min' => 'O preço deve ser maior que zero.',
-
-                // categoria_id
-                'categoria_id.required' => 'A categoria é obrigatória.',
-                'categoria_id.exists' => 'A categoria selecionada não existe.',
-
-                // imagem
-                'imagem.image' => 'O arquivo deve ser uma imagem válida.',
-                'imagem.mimes' => 'A imagem deve estar no formato: jpg, jpeg ou png.',
-                'imagem.max' => 'A imagem não pode ter mais que 2MB.',
-
-                // ativo
-                'ativo.required' => 'O campo "ativo" é obrigatório.',
-                'ativo.boolean' => 'O campo "ativo" deve ser verdadeiro ou falso (true ou false).',
-            ]
-        );
-
-        $validacao['imagem'] = $this->uploadImagem($request);
-
-
-        // Add novo Produto na base de dados
-        // $produto = Produto::create($request->all());
-        $produto = Produto::create($validacao);
+        $produto = Produto::create($dadosProduto);
 
         return ApiResponse::sucesso($produto, 'Produto cadastrado com sucesso');
     }
@@ -83,70 +41,38 @@ class ProdutoController extends Controller
         // Exibir um Produto em especifico
         $produto = Produto::Find($id);
 
-        if($produto) {
-            return ApiResponse::sucesso($produto);
-        } else {
+        if(!$produto) {
             return ApiResponse::erro('Produto não encontrado');
         }
+
+        return ApiResponse::sucesso($produto);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(ProdutoRequest $request, string $id)
     {
-        // Validar o produto Atualizado
-        $validacao = $request->validate(
-            [
-                'nome' => 'required|string|min:3|max:100',
-                'descricao' => 'nullable|string|max:1000',
-                'preco' => 'required|numeric|min:0.01',
-                'categoria_id' => 'required|exists:categorias,id',
-                'imagem' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-                'ativo' => 'required|boolean',
-            ],
-            [
-                // nome
-                'nome.required' => 'O nome do produto é obrigatório.',
-                'nome.string' => 'O nome do produto deve ser um texto válido.',
-                'nome.min' => 'O nome do produto deve ter no mínimo 3 caracteres.', 
-                'nome.max' => 'O nome do produto não pode ter mais que 100 caracteres.', 
-                
-                // descricao
-                'descricao.string' => 'A descrição do produto deve ser um texto válido.',
-                'descricao.max' => 'A descrição do produto não pode ter mais que 1000 caracteres.',
+        // Atualizar um 'Produto'
+        $dadosProduto = $request->validated();
+        
+        $produto = Produto::find($id);
 
-                // preco
-                'preco.required' => 'O preço do produto é obrigatório.',
-                'preco.numeric' => 'O preço deve ser um número válido.',
-                'preco.min' => 'O preço deve ser maior que zero.',
-
-                // categoria_id
-                'categoria_id.required' => 'A categoria é obrigatória.',
-                'categoria_id.exists' => 'A categoria selecionada não existe.',
-
-                // imagem
-                'imagem.image' => 'O arquivo deve ser uma imagem válida.',
-                'imagem.mimes' => 'A imagem deve estar no formato: jpg, jpeg ou png.',
-                'imagem.max' => 'A imagem não pode ter mais que 2MB.',
-
-                // ativo
-                'ativo.required' => 'O campo "ativo" é obrigatório.',
-                'ativo.boolean' => 'O campo "ativo" deve ser verdadeiro ou falso (true ou false).',
-            ]
-        );
-
-        $validacao['imagem'] = $this->uploadImagem($request);
-
-        // Atualizar Produto
-        $produto = Produto::Find($id);
-
-        if($produto) {
-            $produto->update($validacao);
-            return ApiResponse::sucesso($produto, 'Produto Atualizado com sucesso');
-        } else {
-             return ApiResponse::erro('Produto não encontrado');
+        if(!$produto) {
+            return ApiResponse::erro('Produto não encontrado');
         }
+
+        $oldImage = $produto->imagem;
+
+        if ($request->hasFile('imagem')) {
+            $dadosProduto['imagem'] = $this->uploadImagem($request);
+            $this->destroyFileImage($oldImage);
+        }else {
+            unset($dadosProduto['imagem']);
+        }
+
+        $produto->update($dadosProduto);
+        return ApiResponse::sucesso($produto, 'Produto Atualizado com sucesso');
     }
 
     /**
@@ -155,33 +81,35 @@ class ProdutoController extends Controller
     public function destroy(string $id)
     {
          // Deletar uma Categoria
-        $produto = Produto::Find($id);
+        $produto = Produto::find($id);
 
-        if($produto) {
-            $produto->delete();
-            return ApiResponse::sucesso($produto, 'Produto deletado com sucesso!');
-        } else {
-             return ApiResponse::erro('Produto não encontrado');
+        if(!$produto) {
+            return ApiResponse::erro('Produto não encontrado');
         }
+
+        $produto->delete();
+        $this->destroyFileImage($produto['imagem']);
+
+        return ApiResponse::sucesso($produto['nome'], 'Produto deletado com sucesso!');
     }
+
+    /**
+     * Funções personalizadas 
+     */
 
     private function uploadImagem($request)
     {
-        $imagemUrl = null;
-
-        if ($request->hasFile('imagem') && $request->file('imagem')->isValid()) {
-            
-            $requestImagem = $request['imagem'];
-            $nomeImagem = $requestImagem->getClientOriginalName();
-            $extensaoImagem = $requestImagem->extension();
-
-            $novaImagem = md5(uniqid() . $nomeImagem) . '.' . $extensaoImagem;
-
-            $requestImagem->move(public_path('img/cardapio/'), $novaImagem);
-
-            $imagemUrl = $novaImagem;
+        if($request->hasFile('imagem')) {
+            return Storage::disk('public')->put('cardapio', $request->file('imagem'));
         }
-        
-        return $imagemUrl;
+
+        return 'cardapio/default.png';
+    }
+
+    private function destroyFileImage($requestDelete)
+    {
+        if($requestDelete != 'cardapio/default.png') {
+            Storage::disk('public')->delete($requestDelete);
+        }
     }
 }
