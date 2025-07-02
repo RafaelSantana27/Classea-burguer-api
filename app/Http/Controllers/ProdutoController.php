@@ -3,19 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProdutoRequest;
-use App\Models\Produto;
-use App\Services\ApiResponse;
-use Illuminate\Support\Facades\Storage;
+use App\Services\ProdutoService;
 
 class ProdutoController extends Controller
 {
+    protected $produtoService;
+
+    public function __construct(ProdutoService $produtoService)
+    {
+        $this->produtoService = $produtoService;
+    }
+
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
         // Retorna todos produtos da base de dados
-        return ApiResponse::sucesso(Produto::all());
+        $produtos = $this->produtoService->todosProdutos();
+        return $produtos;
     }
 
     /**
@@ -24,13 +31,8 @@ class ProdutoController extends Controller
     public function store(ProdutoRequest $request)
     {
         // Add novo 'Produto' na base de dados
-        $dadosProduto = $request->validated();
-
-        $dadosProduto['imagem'] = $this->uploadImagem($request);
-
-        $produto = Produto::create($dadosProduto);
-
-        return ApiResponse::sucesso($produto, 'Produto cadastrado com sucesso');
+        $dadosProduto = $this->produtoService->cadastrarProduto($request);
+        return $dadosProduto;
     }
 
     /**
@@ -39,13 +41,8 @@ class ProdutoController extends Controller
     public function show(string $id)
     {
         // Exibir um Produto em especifico
-        $produto = Produto::Find($id);
-
-        if(!$produto) {
-            return ApiResponse::erro('Produto não encontrado');
-        }
-
-        return ApiResponse::sucesso($produto);
+        $produto = $this->produtoService->buscarPorId($id);
+        return $produto;        
     }
 
     /**
@@ -54,25 +51,8 @@ class ProdutoController extends Controller
     public function update(ProdutoRequest $request, string $id)
     {
         // Atualizar um 'Produto'
-        $dadosProduto = $request->validated();
-        
-        $produto = Produto::find($id);
-
-        if(!$produto) {
-            return ApiResponse::erro('Produto não encontrado');
-        }
-
-        $oldImage = $produto->imagem;
-
-        if ($request->hasFile('imagem')) {
-            $dadosProduto['imagem'] = $this->uploadImagem($request);
-            $this->destroyFileImage($oldImage);
-        }else {
-            unset($dadosProduto['imagem']);
-        }
-
-        $produto->update($dadosProduto);
-        return ApiResponse::sucesso($produto, 'Produto Atualizado com sucesso');
+        $dadosProduto = $this->produtoService->atualizarProduto($request, $id);
+        return $dadosProduto;
     }
 
     /**
@@ -80,36 +60,8 @@ class ProdutoController extends Controller
      */
     public function destroy(string $id)
     {
-         // Deletar uma Categoria
-        $produto = Produto::find($id);
-
-        if(!$produto) {
-            return ApiResponse::erro('Produto não encontrado');
-        }
-
-        $produto->delete();
-        $this->destroyFileImage($produto['imagem']);
-
-        return ApiResponse::sucesso($produto['nome'], 'Produto deletado com sucesso!');
-    }
-
-    /**
-     * Funções personalizadas 
-     */
-
-    private function uploadImagem($request)
-    {
-        if($request->hasFile('imagem')) {
-            return Storage::disk('public')->put('cardapio', $request->file('imagem'));
-        }
-
-        return 'cardapio/default.png';
-    }
-
-    private function destroyFileImage($requestDelete)
-    {
-        if($requestDelete != 'cardapio/default.png') {
-            Storage::disk('public')->delete($requestDelete);
-        }
+        // Deletar uma Categoria
+        $produto = $this->produtoService->deletarProduto($id);
+        return $produto;
     }
 }
