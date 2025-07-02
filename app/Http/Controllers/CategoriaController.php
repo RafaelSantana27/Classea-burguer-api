@@ -3,18 +3,28 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CategoriaRequest;
-use App\Models\Categoria;
 use App\Services\ApiResponse;
+use App\Services\CategoriaService;
 
 class CategoriaController extends Controller
 {
+    protected $categoriaService;
+
+    public function __construct(CategoriaService $categoriaService)
+    {
+        $this->categoriaService = $categoriaService;
+    }
+
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
         // Retorna todas as 'Categorias' da base de dados
-        return ApiResponse::sucesso(Categoria::all());
+        $categorias = $this->categoriaService->todasCategoria();
+
+        return $categorias;
     }
 
     /**
@@ -23,9 +33,10 @@ class CategoriaController extends Controller
     public function store(CategoriaRequest $request)
     {
         // Add nova 'Categoria' na base de dados
-        $categoria = Categoria::create($request->validated());
-        return ApiResponse::sucesso($categoria, 'Categoria cadastrada com sucesso');
+        $categoria = $this->categoriaService->cadastrarCategoria($request->validated());
 
+        return $categoria;
+        // return ApiResponse::sucesso($categoria, 'Categoria cadastrada com sucesso');
     }
 
     /**
@@ -34,13 +45,9 @@ class CategoriaController extends Controller
     public function show(string $id)
     {
         // Exibir uma 'Categoria' em especifico
-        $categoria = Categoria::Find($id);
-
-        if($categoria) {
-            return ApiResponse::sucesso($categoria);
-        } else {
-            return ApiResponse::erro('Categoria não encontrada');
-        }
+        $categoria = $this->categoriaService->buscarPorId($id);
+        
+        return $categoria;
     }
 
     /**
@@ -49,14 +56,9 @@ class CategoriaController extends Controller
     public function update(CategoriaRequest $request, string $id)
     {
         // Atualizar uma 'Categoria'
-        $categoria = Categoria::Find($id);
-
-        if($categoria) {
-            $categoria->update($request->validated());
-            return ApiResponse::sucesso($categoria, 'Categoria atualizada com sucesso!');
-        } else {
-             return ApiResponse::erro('Categoria não encontrada');
-        }
+        $categoria = $this->categoriaService->atualizarCategoria($id, $request->validated());
+        
+        return $categoria;
     }
 
     /**
@@ -64,14 +66,10 @@ class CategoriaController extends Controller
      */
     public function destroy(string $id)
     {
-         // Deletar uma Categoria
-        $categoria = Categoria::Find($id);
+        // Deletar uma Categoria
+        // return $this->categoriaService->deletarCategoria($id);
+        $categoria = $this->categoriaService->deletarCategoria($id);
 
-        if($categoria) {
-            $categoria->delete();
-            return ApiResponse::sucesso($categoria, 'Categoria deletada com sucesso!');
-        } else {
-             return ApiResponse::erro('Categoria não encontrada');
-        }
+        return $categoria;
     }
 }
