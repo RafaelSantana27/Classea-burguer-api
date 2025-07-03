@@ -51,7 +51,7 @@ class ProdutoController extends Controller
     public function update(ProdutoRequest $request, string $id)
     {
         // Atualizar um 'Produto'
-        $dadosProduto = $this->produtoService->atualizarProduto($request, $id);
+        $dadosProduto = $this->produtoService->atualizarProduto($id, $request);
         return $dadosProduto;
     }
 

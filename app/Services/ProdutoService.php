@@ -35,7 +35,7 @@ class ProdutoService
         return ApiResponse::sucesso($produto);
     }
 
-    public function atualizarProduto(Request $request, string $id) 
+    public function atualizarProduto(string $id, Request $request) 
     {    
         $produto = Produto::find($id);
 
