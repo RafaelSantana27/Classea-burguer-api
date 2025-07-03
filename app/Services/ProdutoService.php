@@ -2,15 +2,22 @@
 
 namespace App\Services;
 
-use App\Models\Produto;
+use App\Repositories\ProdutoRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class ProdutoService
 {
+    protected $produtoRepository;
+
+    public function __construct(ProdutoRepository $produtoRepository)
+    {
+        $this->produtoRepository = $produtoRepository;
+    }
+
     public function todosProdutos()
     {
-        return ApiResponse::sucesso(Produto::all());
+        return ApiResponse::sucesso($this->produtoRepository->buscarProdutosAtivos());
     }
 
     public function cadastrarProduto(Request $request) 
@@ -19,14 +26,14 @@ class ProdutoService
 
         $dados['imagem'] = $this->uploadImagem($request);
         
-        $produto = Produto::create($dados);
+        $produto = $this->produtoRepository->create($dados);
 
         return ApiResponse::sucesso($produto, 'Produto cadastrado com sucesso');
     }
 
     public function buscarPorId(string $id)
     {
-        $produto = Produto::find($id);
+        $produto = $this->produtoRepository->find($id);
 
         if(!$produto) {
             return ApiResponse::erro('Produto não encontrado');
@@ -37,39 +44,37 @@ class ProdutoService
 
     public function atualizarProduto(string $id, Request $request) 
     {    
-        $produto = Produto::find($id);
+        $dadosProduto = $request->validated(); //Verificar depois se da para melhorar ordem
 
+        $produto = $this->produtoRepository->find($id);
+        
         if(!$produto) {
             return ApiResponse::erro('Produto não encontrado');
         }
-
-        $dadosProduto = $request->validated();
-
+        
         $oldImage = $produto->imagem;
-
+        
         if ($request->hasFile('imagem')) {
             $dadosProduto['imagem'] = $this->uploadImagem($request);
             $this->destroyFileImage($oldImage);
         }else {
             unset($dadosProduto['imagem']);
         }
-
-        $produto->update($dadosProduto);
+        
+        $produto = $this->produtoRepository->update($id, $dadosProduto);
 
         return ApiResponse::sucesso($produto, 'Produto Atualizado com sucesso');
     }
 
     public function deletarProduto($id)
     {
-        $produto = Produto::find($id);
+        $produto = $this->produtoRepository->delete($id);
 
         if(!$produto) {
             return ApiResponse::erro('Produto não encontrado');
         }
 
-        $produto->delete();
         $this->destroyFileImage($produto['imagem']);
-
         return ApiResponse::sucesso($produto['nome'], 'Produto deletado com sucesso!');
     }
 
