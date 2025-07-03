@@ -30,7 +30,7 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public static function all():Collection 
     {
-        return self::loadModel()::all();
+        return self::loadModel()::all()?->makeHidden(['created_at', 'updated_at']);
     }
     
     /**
@@ -41,7 +41,7 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public static function find(int $id): ?Model
     {
-        return self::loadModel()::query()->find($id);
+        return self::loadModel()::query()->find($id)?->makeHidden(['created_at', 'updated_at']);
     }
 
     /**
@@ -52,7 +52,8 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public static function create(array $dados): ?Model
     {
-        return self::loadModel()::query()->create($dados);
+        $model = self::loadModel()::query()->create($dados);
+        return $model?->makeHidden(['created_at', 'updated_at']);
     }
 
     /**
@@ -62,9 +63,16 @@ abstract class AbstractRepository implements RepositoryInterface
      * @param  array  $dados
      * @return int  Número de registros atualizados (0 ou 1)
      */
-    public static function update(int $id, array $dados): int
+    public static function update(int $id, array $dados): ?Model
     {
-        return self::loadModel()::query()->where(['id' => $id])->update($dados);
+        $model = self::loadModel()::find($id);
+
+        if(!$model) {
+            return null;
+        }
+
+        $model->update($dados);
+        return $model->makeHidden(['created_at', 'updated_at']);
     }
 
     /**
@@ -73,8 +81,15 @@ abstract class AbstractRepository implements RepositoryInterface
      * @param  int  $id
      * @return int  Número de registros deletados (0 ou 1)
      */
-    public static function delete(int $id): int
+    public static function delete(int $id): ?Model
     {
-        return self::loadModel()::query()->where(['id' => $id])->delete();
+        $model = self::loadModel()::find($id);
+
+        if(!$model) {
+            return null;
+        }
+
+        $model->delete();
+        return $model;
     }
 }

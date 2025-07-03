@@ -3,24 +3,32 @@
 namespace App\Services;
 
 use App\Models\Categoria;
+use App\Repositories\CategoriaRepository;
 
 class CategoriaService 
 {
+    protected $categoriaRepository;
+
+    public function __construct(CategoriaRepository  $categoriaRepository )
+    {
+        $this->categoriaRepository = $categoriaRepository;
+    }
+
+
     public function todasCategoria()
     {
-         return ApiResponse::sucesso(Categoria::all());
+        return ApiResponse::sucesso($this->categoriaRepository->all());
     }
 
     public function cadastrarCategoria(array $dados) 
     {
-        $categoria = Categoria::create($dados);
-
+        $categoria = $this->categoriaRepository->create($dados);
         return ApiResponse::sucesso($categoria, 'Categoria cadastrada com sucesso');
     }
 
     public function buscarPorId(string $id)
     {
-        $categoria = Categoria::find($id);
+        $categoria = $this->categoriaRepository->find($id);
 
         if(!$categoria) {
             return ApiResponse::erro('Categoria não encontrada');
@@ -31,26 +39,24 @@ class CategoriaService
 
     public function atualizarCategoria(string $id, array $dados) 
     {    
-        $categoria = Categoria::find($id);
+        $categoria = $this->categoriaRepository->update($id, $dados);
 
         if (!$categoria) {
             return ApiResponse::erro('Categoria não encontrada');
         }
 
-        $categoria->update($dados);
         return ApiResponse::sucesso($categoria, 'Categoria atualizada com sucesso!');
     }
 
     public function deletarCategoria($id)
     {
-        $categoria = Categoria::find($id);
+        $categoria = $this->categoriaRepository->delete($id);
 
         if (!$categoria) {
             return ApiResponse::erro('Categoria não encontrada');
         }
 
-        $categoria->delete();
-        return ApiResponse::sucesso($categoria, 'Categoria deletada com sucesso!');
+        return ApiResponse::sucesso($categoria['nome'], 'Categoria deletada com sucesso!');
     }
 
 }
