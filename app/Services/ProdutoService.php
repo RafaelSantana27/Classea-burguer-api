@@ -17,14 +17,18 @@ class ProdutoService
 
     public function todosProdutos()
     {
-        return ApiResponse::sucesso($this->produtoRepository->buscarProdutosAtivos());
+        return ApiResponse::sucesso($this->produtoRepository->all());
     }
 
-    public function cadastrarProduto(Request $request) 
+    public function cadastrarProduto($dados) 
     {
-        $dados = $request->validated();
+        $arquivo = $dados['imagem'] ?? null;
 
-        $dados['imagem'] = $this->uploadImagem($request);
+        if($arquivo instanceof \Illuminate\Http\UploadedFile) {
+            $dados['imagem'] = $this->uploadImagem($arquivo);
+        } else {
+            $dados['imagem'] = 'cardapio/default.png'; 
+        }
         
         $produto = $this->produtoRepository->create($dados);
 
@@ -42,10 +46,8 @@ class ProdutoService
         return ApiResponse::sucesso($produto);
     }
 
-    public function atualizarProduto(string $id, Request $request) 
+    public function atualizarProduto(string $id, $dados) 
     {    
-        $dadosProduto = $request->validated(); //Verificar depois se da para melhorar ordem
-
         $produto = $this->produtoRepository->find($id);
         
         if(!$produto) {
@@ -53,15 +55,16 @@ class ProdutoService
         }
         
         $oldImage = $produto->imagem;
+        $arquivo = $dados['imagem'] ?? null;
         
-        if ($request->hasFile('imagem')) {
-            $dadosProduto['imagem'] = $this->uploadImagem($request);
+        if($arquivo instanceof \Illuminate\Http\UploadedFile) {
+            $dados['imagem'] = $this->uploadImagem($arquivo);
             $this->destroyFileImage($oldImage);
         }else {
-            unset($dadosProduto['imagem']);
+            unset($arquivo);
         }
         
-        $produto = $this->produtoRepository->update($id, $dadosProduto);
+        $produto = $this->produtoRepository->update($id, $dados);
 
         return ApiResponse::sucesso($produto, 'Produto Atualizado com sucesso');
     }
@@ -82,13 +85,9 @@ class ProdutoService
      ******** Funções personalizadas 
      */
 
-    private function uploadImagem($request)
+    private function uploadImagem($arquivoIMG)
     {
-        if($request->hasFile('imagem')) {
-            return Storage::disk('public')->put('cardapio', $request->file('imagem'));
-        }
-
-        return 'cardapio/default.png';
+        return $arquivoIMG->store('cardapio', 'public');
     }
 
     private function destroyFileImage($requestDelete)

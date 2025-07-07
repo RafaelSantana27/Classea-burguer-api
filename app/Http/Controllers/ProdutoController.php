@@ -31,7 +31,7 @@ class ProdutoController extends Controller
     public function store(ProdutoRequest $request)
     {
         // Add novo 'Produto' na base de dados
-        $dadosProduto = $this->produtoService->cadastrarProduto($request);
+        $dadosProduto = $this->produtoService->cadastrarProduto($request->validated());
         return $dadosProduto;
     }
 
@@ -51,7 +51,7 @@ class ProdutoController extends Controller
     public function update(ProdutoRequest $request, string $id)
     {
         // Atualizar um 'Produto'
-        $dadosProduto = $this->produtoService->atualizarProduto($id, $request);
+        $dadosProduto = $this->produtoService->atualizarProduto($id, $request->validated());
         return $dadosProduto;
     }
 
