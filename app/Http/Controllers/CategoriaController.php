@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CategoriaRequest;
+use App\Services\ApiResponse;
 use App\Services\CategoriaService;
 
 class CategoriaController extends Controller
@@ -22,7 +23,7 @@ class CategoriaController extends Controller
     {
         // Retorna todas as 'Categorias' da base de dados
         $categorias = $this->categoriaService->todasCategoria();
-        return $categorias;
+        return ApiResponse::sucesso($categorias);
     }
 
     /**
@@ -32,7 +33,7 @@ class CategoriaController extends Controller
     {
         // Add nova 'Categoria' na base de dados
         $categoria = $this->categoriaService->cadastrarCategoria($request->validated());
-        return $categoria;
+        return ApiResponse::sucesso($categoria, 'Categoria cadastrada com sucesso');
     }
 
     /**
@@ -42,7 +43,12 @@ class CategoriaController extends Controller
     {
         // Exibir uma 'Categoria' em especifico
         $categoria = $this->categoriaService->buscarPorId($id);
-        return $categoria;
+        
+        if(!$categoria) {
+            return ApiResponse::erro('Categoria não encontrada');
+        }
+        
+        return ApiResponse::sucesso($categoria);
     }
 
     /**
@@ -52,7 +58,12 @@ class CategoriaController extends Controller
     {
         // Atualizar uma 'Categoria'
         $categoria = $this->categoriaService->atualizarCategoria($id, $request->validated());
-        return $categoria;
+
+        if (!$categoria) {
+            return ApiResponse::erro('Categoria não encontrada');
+        }
+
+        return ApiResponse::sucesso($categoria, 'Categoria atualizada com sucesso!');
     }
 
     /**
@@ -61,8 +72,12 @@ class CategoriaController extends Controller
     public function destroy(string $id)
     {
         // Deletar uma Categoria
-        // return $this->categoriaService->deletarCategoria($id);
         $categoria = $this->categoriaService->deletarCategoria($id);
-        return $categoria;
+
+        if (!$categoria) {
+            return ApiResponse::erro('Categoria não encontrada');
+        }
+
+        return ApiResponse::sucesso($categoria['nome'], 'Categoria deletada com sucesso!');
     }
 }

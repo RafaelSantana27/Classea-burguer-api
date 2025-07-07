@@ -16,46 +16,26 @@ class CategoriaService
 
     public function todasCategoria()
     {
-        return ApiResponse::sucesso($this->categoriaRepository->all());
+        return $this->categoriaRepository->all();
     }
 
     public function cadastrarCategoria(array $dados) 
     {
-        $categoria = $this->categoriaRepository->create($dados);
-        return ApiResponse::sucesso($categoria, 'Categoria cadastrada com sucesso');
+        return $this->categoriaRepository->create($dados);
     }
 
     public function buscarPorId(string $id)
     {
-        $categoria = $this->categoriaRepository->find($id);
-
-        if(!$categoria) {
-            return ApiResponse::erro('Categoria não encontrada');
-        }
-        
-        return ApiResponse::sucesso($categoria);
+        return $this->categoriaRepository->find($id);
     }
 
     public function atualizarCategoria(string $id, array $dados) 
     {    
-        $categoria = $this->categoriaRepository->update($id, $dados);
-
-        if (!$categoria) {
-            return ApiResponse::erro('Categoria não encontrada');
-        }
-
-        return ApiResponse::sucesso($categoria, 'Categoria atualizada com sucesso!');
+        return $this->categoriaRepository->update($id, $dados);
     }
 
     public function deletarCategoria($id)
     {
-        $categoria = $this->categoriaRepository->delete($id);
-
-        if (!$categoria) {
-            return ApiResponse::erro('Categoria não encontrada');
-        }
-
-        return ApiResponse::sucesso($categoria['nome'], 'Categoria deletada com sucesso!');
+        return $this->categoriaRepository->delete($id);
     }
-
 }
