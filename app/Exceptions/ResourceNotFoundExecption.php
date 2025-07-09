@@ -4,16 +4,16 @@ namespace App\Exceptions;
 
 use Exception;
 
-class ValidationException extends Exception{
+class ResourceNotFoundExecption extends Exception{
 
     public function render($resquest) 
     {
         return response()->json(
             [
-                'codigo_status' => $this->getCode(),
+                'codigo_status' => 404,
                 'mensagem' => $this->getMessage()
             ],
-            $this->getCode()
+            404
         );
     }
 }
