@@ -59,9 +59,9 @@ class ProdutoController extends Controller
         // Atualizar um 'Produto'
         $dadosProduto = $this->produtoService->atualizarProduto($id, $request->validated());
 
-        if(!$dadosProduto) {
-            return ApiResponse::erro('Produto não encontrado');
-        }
+        // if(!$dadosProduto) {
+        //     return ApiResponse::erro('Produto não encontrado');
+        // }
 
         return ApiResponse::sucesso($dadosProduto, 'Produto Atualizado com sucesso');
     }

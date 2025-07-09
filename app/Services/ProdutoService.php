@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Repositories\ProdutoRepository;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 class ProdutoService
 {
@@ -23,7 +25,7 @@ class ProdutoService
     {
         $arquivo = $dados['imagem'] ?? null;
 
-        if($arquivo instanceof \Illuminate\Http\UploadedFile) {
+        if($arquivo instanceof UploadedFile) {
             $dados['imagem'] = $this->uploadImagem($arquivo);
         } else {
             $dados['imagem'] = 'cardapio/default.png'; 
@@ -44,13 +46,13 @@ class ProdutoService
         $produto = $this->produtoRepository->find($id);
         
         if(!$produto) {
-            return;
+            throw new ResourceNotFoundException("Produto não encontrado");
         }
         
         $oldImage = $produto->imagem;
         $arquivo = $dados['imagem'] ?? null;
         
-        if($arquivo instanceof \Illuminate\Http\UploadedFile) {
+        if($arquivo instanceof UploadedFile) {
             $dados['imagem'] = $this->uploadImagem($arquivo);
             $this->destroyFileImage($oldImage);
         }else {
@@ -66,7 +68,7 @@ class ProdutoService
         $produto = $this->produtoRepository->delete($id);
 
         if(!$produto) {
-            return;
+            throw new ResourceNotFoundException("Produto não encontrado");
         }
 
         $this->destroyFileImage($produto['imagem']);
