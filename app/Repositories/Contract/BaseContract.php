@@ -12,5 +12,4 @@ interface BaseContract
     public function create(array $dados): ?Model;
     public function update(int $id, array $dados): ?Model;
     public function delete(int $id): ?Model;
-    public function loadModel():Model;
 }
