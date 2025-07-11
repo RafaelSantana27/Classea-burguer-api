@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
+use App\Exceptions\ResourceNotFoundExecption;
 use App\Repositories\ProdutoRepository;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 class ProdutoService
 {
@@ -38,16 +38,18 @@ class ProdutoService
 
     public function buscarPorId(string $id)
     {
-        return $this->produtoRepository->find($id);
+        $produto = $this->produtoRepository->find($id);
+
+        if(!$produto) {
+            throw new ResourceNotFoundExecption("Produto não encontrado.");
+        }
+
+        return $produto;
     }
 
     public function atualizarProduto(string $id, $dados) 
     {    
-        $produto = $this->produtoRepository->find($id);
-        
-        if(!$produto) {
-            throw new ResourceNotFoundException("Produto não encontrado");
-        }
+        $produto = $this->buscarPorId($id);
         
         $oldImage = $produto->imagem;
         $arquivo = $dados['imagem'] ?? null;
@@ -59,21 +61,16 @@ class ProdutoService
             unset($arquivo);
         }
         
-        $produto = $this->produtoRepository->update($id, $dados);
-        return $produto;
+        $produtoAtualizado = $this->produtoRepository->update($id, $dados);
+        return $produtoAtualizado;
     }
 
     public function deletarProduto($id)
     {
-        $produto = $this->produtoRepository->delete($id);
-
-        if(!$produto) {
-            throw new ResourceNotFoundException("Produto não encontrado");
-        }
-
+        $produto = $this->buscarPorId($id);
         $this->destroyFileImage($produto['imagem']);
-        return $produto;
-
+              
+        return $this->produtoRepository->delete($id);
     }
 
     /**
