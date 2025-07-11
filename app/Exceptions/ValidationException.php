@@ -2,18 +2,14 @@
 
 namespace App\Exceptions;
 
+use App\Http\Response\BaseResponse;
 use Exception;
 
 class ValidationException extends Exception{
 
     public function render($resquest) 
     {
-        return response()->json(
-            [
-                'codigo_status' => $this->getCode(),
-                'mensagem' => $this->getMessage()
-            ],
-            $this->getCode()
-        );
+        $erros = json_decode($this->getMessage(), false);
+        return BaseResponse::erros("Ocorreram erros de validação", $erros, $this->getCode());
     }
 }

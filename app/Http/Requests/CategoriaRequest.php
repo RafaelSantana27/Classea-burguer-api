@@ -34,7 +34,7 @@ class CategoriaRequest extends BaseFormRequest
             'nome.min' => 'O nome da categoria deve ter no mínimo 2 caracteres.', 
             'nome.max' => 'O nome da categoria não pode ter mais que 100 caracteres.', 
 
-            'ativo.boolean' => 'O campo "ativo" deve ser verdadeiro ou falso (true ou false).',
+            'ativo.boolean' => "O campo 'ativo' deve ser verdadeiro ou falso (true ou false).",
         ];
     }
 

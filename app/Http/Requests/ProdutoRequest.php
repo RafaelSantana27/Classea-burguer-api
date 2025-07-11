@@ -61,7 +61,7 @@ class ProdutoRequest extends BaseFormRequest
 
             // ativo
             'ativo.required' => 'O campo "ativo" é obrigatório.',
-            'ativo.boolean' => 'O campo "ativo" deve ser verdadeiro ou falso (true ou false).',
+            'ativo.boolean' => "O campo 'ativo' deve ser verdadeiro ou falso (true ou false).",
         ];
     }
 }
