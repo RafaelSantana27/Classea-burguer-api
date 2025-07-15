@@ -4,8 +4,6 @@ use App\Http\Controllers\AdicionalController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\ProdutoController;
-use App\Services\ApiResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Laravel\Sanctum\Sanctum;
 
