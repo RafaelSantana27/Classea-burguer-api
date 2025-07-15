@@ -41,7 +41,7 @@ class AdicionalController extends Controller
     {
         // Exibir um 'Adicional' em especifico
         $adicional = $this->adicionalService->buscarPorId($id);
-        return BaseResponse::sucesso("Adicinal identificado com sucesso", $adicional);
+        return BaseResponse::sucesso("Adicional identificado com sucesso", $adicional);
     }
 
     /**
