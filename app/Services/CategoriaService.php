@@ -38,13 +38,14 @@ class CategoriaService
 
     public function atualizarCategoria(string $id, array $dados) 
     {    
-        $this->buscarPorId($id);        
-        return $this->categoriaRepository->update($id, $dados);
+        $categoria = $this->buscarPorId($id);   
+        $categoria->fill($dados);     
+        return $this->categoriaRepository->update($categoria);
     }
 
     public function deletarCategoria($id)
     {
-        $this->buscarPorId($id);
-        return $this->categoriaRepository->delete($id);
+        $categoria = $this->buscarPorId($id);   
+        return $this->categoriaRepository->delete($categoria);
     }
 }

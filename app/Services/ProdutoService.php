@@ -61,8 +61,9 @@ class ProdutoService
             unset($arquivo);
         }
         
-        $produtoAtualizado = $this->produtoRepository->update($id, $dados);
-        return $produtoAtualizado;
+        $produto->fill($dados);
+        $this->produtoRepository->update($produto);
+        return $produto;
     }
 
     public function deletarProduto($id)
@@ -70,7 +71,7 @@ class ProdutoService
         $produto = $this->buscarPorId($id);
         $this->destroyFileImage($produto['imagem']);
               
-        return $this->produtoRepository->delete($id);
+        return $this->produtoRepository->delete($produto);
     }
 
     /**
