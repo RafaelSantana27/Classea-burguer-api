@@ -2,16 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Response\BaseResponse;
+use App\Services\AdicionalService;
 use Illuminate\Http\Request;
 
 class AdicionalController extends Controller
 {
+    public function __construct(
+        protected AdicionalService $adicionalService
+    )
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        // Retorna todos os 'Adicinal' da base de dados
+        $adicional = $this->adicionalService->todosAdicionais();
+        return BaseResponse::sucesso('Lista de Adicional carregada com sucesso', $adicional);
     }
 
     /**
