@@ -29,10 +29,18 @@ class AdicionalRequest extends BaseFormRequest
     public function messages(): array
     {
         return [
+
+            // nome
             'nome.required' => 'O nome do adicional é obrigatório.',
             'nome.string' => 'O nome do adicional deve ser um texto válido.',
             'nome.max' => 'O nome da categoria não pode ter mais que 50 caracteres.', 
 
+            // preco
+            'preco.required' => 'O preço do produto é obrigatório.',
+            'preco.numeric' => 'O preço deve ser um número válido.',
+            'preco.min' => 'O preço deve ser maior que zero.',
+
+            // ativo
             'ativo.boolean' => "O campo 'ativo' deve ser verdadeiro ou falso (true ou false).",
         ];
     }
