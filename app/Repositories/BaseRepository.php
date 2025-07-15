@@ -30,31 +30,30 @@ abstract class BaseRepository implements BaseContract
         return $new?->makeHidden(['created_at', 'updated_at']);
     }
 
-    public function update(int $id, array $data): ?Model
+    public function update(Model $model): ?Model
     {
-        $update = $this->model->find($id);
-        $update->update($data);
-        return $update?->makeHidden(['created_at', 'updated_at']);
+        $model->save();
+        return $model;
     }
 
-    public function delete(int $id): ?Model
+    public function delete(Model $model): ?Model
     {
-        $delete = $this->model->find($id);
-        $delete->delete();
-        return $delete;
+        $model->delete();
+        return $model;
     }
+    
+    // ------------------ > Anterior <------------------
+    // public function update(int $id, array $data): ?Model
+    // {
+    //     $update = $this->model->find($id);
+    //     $update->update($data);
+    //     return $update?->makeHidden(['created_at', 'updated_at']);
+    // }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    // public function delete(int $id): ?Model
+    // {
+    //     $delete = $this->model->find($id);
+    //     $delete->delete();
+    //     return $delete;
+    // }
 }
