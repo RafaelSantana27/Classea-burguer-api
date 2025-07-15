@@ -2,16 +2,14 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-
-class AdicionalRequest extends FormRequest
+class AdicionalRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +20,20 @@ class AdicionalRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'nome' => 'required|string|max:50',
+            'preco' => 'required|numeric|min:0',
+            'ativo' => 'boolean',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'nome.required' => 'O nome do adicional é obrigatório.',
+            'nome.string' => 'O nome do adicional deve ser um texto válido.',
+            'nome.max' => 'O nome da categoria não pode ter mais que 50 caracteres.', 
+
+            'ativo.boolean' => "O campo 'ativo' deve ser verdadeiro ou falso (true ou false).",
         ];
     }
 }
