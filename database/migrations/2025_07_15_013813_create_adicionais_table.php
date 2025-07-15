@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('adicionais', function (Blueprint $table) {
             $table->id();
-            $table->string('nome');
+            $table->string('nome', 50);
             $table->decimal('preco', 8, 2)->default(0.00);
             $table->boolean('ativo')->default(true);
             $table->timestamps();
