@@ -4,6 +4,7 @@ use App\Http\Controllers\AdicionalController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\ProdutoController;
+use App\Http\Controllers\UsuarioController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Sanctum\Sanctum;
 
@@ -20,6 +21,9 @@ Route::apiResource('adicionais', AdicionalController::class);
 
 // Produtos
 Route::apiResource('produtos', ProdutoController::class);
+
+// Usuarios
+Route::apiResource('usuarios', UsuarioController::class);
 
 // auth routes
 Route::post('/login', [AuthController::class, 'login']);
