@@ -14,6 +14,8 @@ class Adicional extends Model
         'preco',
         'ativo'
     ];
+    
+    protected $table = 'adicionais';
 
     public function produtos()
     {
