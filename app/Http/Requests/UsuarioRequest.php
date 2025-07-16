@@ -2,7 +2,8 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class UsuarioRequest extends BaseFormRequest
 {
@@ -21,10 +22,21 @@ class UsuarioRequest extends BaseFormRequest
      */
     public function rules(): array
     {
+        $emailRule = ['required', 'string', 'email', 'max:255'];
+        $passwordRule = ['string', 'min:6', 'confirmed'];
+
+        if(Request::isMethod('put')) {
+            $emailRule[] = Rule::unique('users', 'email')->ignore($this->route('usuario'));
+            $passwordRule[] = 'nullable';
+        }else {
+            $emailRule[] = 'unique:users,email';
+            $passwordRule[] = 'required';
+        }
+
         return [
             'name' => 'required|string|max:100',
-            'email' => 'required|string|email|max:255|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
+            'email' => $emailRule,
+            'password' => $passwordRule,
             'is_admin' => 'boolean',
         ];
     }
@@ -47,7 +59,9 @@ class UsuarioRequest extends BaseFormRequest
             'password.required' => 'A senha é obrigatória.',
             'password.string' => 'A senha deve ser um texto.',
             'password.min' => 'A senha deve ter pelo menos 6 caracteres.',
-
+            'password.confirmed' => 'O campo de confirmação de senha não confere.',
+            
+            // admin
             'is_admin.boolean' => 'O campo de administrador deve ser verdadeiro ou falso.',
         ];
     }
